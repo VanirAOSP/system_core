@@ -138,7 +138,7 @@ LOCAL_CFLAGS += -O2
 endif
 LOCAL_CFLAGS += -D_XOPEN_SOURCE -D_GNU_SOURCE
 
-ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
+ifneq (,$(filter userdebug eng tests,$(TARGET_BUILD_VARIANT)))
 LOCAL_CFLAGS += -DALLOW_ADBD_ROOT=1
 endif
 

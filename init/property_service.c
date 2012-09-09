@@ -58,7 +58,7 @@ struct {
     unsigned int uid;
     unsigned int gid;
 } property_perms[] = {
-    { "net.rmnet0.",      AID_RADIO,    0 },
+    { "net.rmnet",        AID_RADIO,    0 },
     { "net.gprs.",        AID_RADIO,    0 },
     { "net.ppp",          AID_RADIO,    0 },
     { "net.qmi",          AID_RADIO,    0 },
@@ -75,6 +75,7 @@ struct {
     { "hw.",              AID_SYSTEM,   0 },
     { "sys.",             AID_SYSTEM,   0 },
     { "service.",         AID_SYSTEM,   0 },
+    { "service.",         AID_RADIO,    0 },
     { "wlan.",            AID_SYSTEM,   0 },
     { "dhcp.",            AID_SYSTEM,   0 },
     { "dhcp.",            AID_DHCP,     0 },
@@ -85,7 +86,8 @@ struct {
     { "service.adb.tcp.port", AID_SHELL,    0 },
     { "persist.sys.",     AID_SYSTEM,   0 },
     { "persist.service.", AID_SYSTEM,   0 },
-    { "persist.security.", AID_SYSTEM,   0 },
+    { "persist.service.", AID_RADIO,    0 },
+    { "persist.security.",AID_SYSTEM,   0 },
     { NULL, 0, 0 }
 };
 
@@ -146,12 +148,12 @@ out:
     return -1;
 }
 
-/* (8 header words + 247 toc words) = 1020 bytes */
-/* 1024 bytes header and toc + 247 prop_infos @ 128 bytes = 32640 bytes */
+/* (8 header words + 372 toc words) = 1520 bytes */
+/* 1536 bytes header and toc + 372 prop_infos @ 128 bytes = 49152 bytes */
 
-#define PA_COUNT_MAX  247
-#define PA_INFO_START 1024
-#define PA_SIZE       32768
+#define PA_COUNT_MAX  372
+#define PA_INFO_START 1536
+#define PA_SIZE       49152
 
 static workspace pa_workspace;
 static prop_info *pa_info_array;

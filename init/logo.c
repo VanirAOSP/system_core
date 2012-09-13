@@ -160,4 +160,3 @@ fail_restore_text:
     vt_set_mode(0);
     return -1;
 }
-

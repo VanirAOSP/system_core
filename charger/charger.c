@@ -62,7 +62,7 @@
 #define BATTERY_FULL_THRESH     99
 
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
-#define LAST_KMSG_MAX_SZ        (32 * 1024)
+#define LAST_KMSG_MAX_SZ        (32768)        /* 32 * 1024 */
 
 #define LOGE(x...) do { KLOG_ERROR("charger", x); } while (0)
 #define LOGI(x...) do { KLOG_INFO("charger", x); } while (0)
@@ -433,8 +433,7 @@ static void process_ps_uevent(struct charger *charger, struct uevent *uevent)
 
     if (!strcmp(uevent->action, "add")) {
         if (!supply) {
-            supply = add_supply(charger, uevent->ps_name, ps_type, uevent->path,
-                                online);
+            supply = add_supply(charger, uevent->ps_name, ps_type, uevent->path, online);
             if (!supply) {
                 LOGE("cannot add supply '%s' (%s %d)\n", uevent->ps_name,
                      uevent->ps_type, online);
@@ -945,7 +944,7 @@ int main(int argc, char **argv)
 
     ev_init(input_callback, charger);
 
-    fd = uevent_open_socket(64*1024, true);
+    fd = uevent_open_socket(65536, true); /* 64*1024 */
     if (fd >= 0) {
         fcntl(fd, F_SETFL, O_NONBLOCK);
         ev_add_fd(fd, uevent_callback, charger);

@@ -57,9 +57,9 @@
 
 #define BATTERY_UNKNOWN_TIME    (2 * MSEC_PER_SEC)
 #define POWER_ON_KEY_TIME       (2 * MSEC_PER_SEC)
-#define UNPLUGGED_SHUTDOWN_TIME (10 * MSEC_PER_SEC)
+#define UNPLUGGED_SHUTDOWN_TIME (2 * MSEC_PER_SEC)
 
-#define BATTERY_FULL_THRESH     95
+#define BATTERY_FULL_THRESH     99
 
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
 #define LAST_KMSG_MAX_SZ        (32 * 1024)
@@ -136,33 +136,33 @@ struct uevent {
 static struct frame batt_anim_frames[] = {
     {
         .name = "charger/battery_0",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 0,
     },
     {
         .name = "charger/battery_1",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 20,
     },
     {
         .name = "charger/battery_2",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 40,
     },
     {
         .name = "charger/battery_3",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 60,
     },
     {
         .name = "charger/battery_4",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 80,
         .level_only = true,
     },
     {
         .name = "charger/battery_5",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = BATTERY_FULL_THRESH,
     },
 };

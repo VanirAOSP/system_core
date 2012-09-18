@@ -15,7 +15,7 @@
  */
 
 //#define DEBUG_UEVENTS
-#define CHARGER_KLOG_LEVEL 6
+#define CHARGER_KLOG_LEVEL 0
 
 #include <dirent.h>
 #include <errno.h>

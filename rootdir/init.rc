@@ -342,7 +342,7 @@ on boot
     chown root system /sys/kernel/mm/ksm/run
     chmod 0664 /sys/kernel/mm/ksm/run
     write /sys/kernel/mm/ksm/sleep_millisecs 2000 # 1200
-    write /sys/kernel/mm/ksm/pages_to_scan 100    # 256
+    write /sys/kernel/mm/ksm/pages_to_scan 181    # 256
 	write /sys/kernel/mm/ksm/run 1
 
 # Set this property so surfaceflinger is not started by system_init
@@ -490,9 +490,9 @@ service installd /system/bin/installd
     class main
     socket installd stream 600 system system
 
-service flash_recovery /system/etc/install-recovery.sh
-    class main
-    oneshot
+#service flash_recovery /system/etc/install-recovery.sh
+#    class main
+#    oneshot
 
 service racoon /system/bin/racoon
     class main

@@ -703,8 +703,7 @@ static void update_screen_state(struct charger *charger, int64_t now)
         charger->next_screen_transition = -1;
         gr_fb_blank(true);
         LOGV("[%lld] animation done\n", now);
-        if (charger->num_supplies_online > 0)
-            request_suspend(true);
+        request_suspend(true);
         return;
     }
 
@@ -844,8 +843,10 @@ static void process_key(struct charger *charger, int code, int64_t now)
             }
         } else {
             /* if the power key got released, force screen state cycle */
-            if (key->pending)
+            if (key->pending) {
+                request_suspend(false);
                 kick_animation(charger->batt_anim);
+            }
         }
     }
 

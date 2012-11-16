@@ -15,25 +15,24 @@
  */
 
 //#define DEBUG_UEVENTS
-#define CHARGER_KLOG_LEVEL 6
+#define CHARGER_KLOG_LEVEL 0
 
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/input.h>
+#include <linux/netlink.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/poll.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <time.h>
 #include <unistd.h>
-
-#include <sys/socket.h>
-#include <linux/netlink.h>
 
 #include <cutils/android_reboot.h>
 #include <cutils/klog.h>
@@ -62,12 +61,12 @@
 
 #define BATTERY_UNKNOWN_TIME    (2 * MSEC_PER_SEC)
 #define POWER_ON_KEY_TIME       (2 * MSEC_PER_SEC)
-#define UNPLUGGED_SHUTDOWN_TIME (10 * MSEC_PER_SEC)
+#define UNPLUGGED_SHUTDOWN_TIME (2 * MSEC_PER_SEC)
 
-#define BATTERY_FULL_THRESH     95
+#define BATTERY_FULL_THRESH     99
 
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
-#define LAST_KMSG_MAX_SZ        (32 * 1024)
+#define LAST_KMSG_MAX_SZ        (32768) /* 32 * 1024 */
 
 #define LOGE(x...) do { KLOG_ERROR("charger", x); } while (0)
 #define LOGI(x...) do { KLOG_INFO("charger", x); } while (0)
@@ -141,33 +140,33 @@ struct uevent {
 static struct frame batt_anim_frames[] = {
     {
         .name = "charger/battery_0",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 0,
     },
     {
         .name = "charger/battery_1",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 20,
     },
     {
         .name = "charger/battery_2",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 40,
     },
     {
         .name = "charger/battery_3",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 60,
     },
     {
         .name = "charger/battery_4",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = 80,
         .level_only = true,
     },
     {
         .name = "charger/battery_5",
-        .disp_time = 750,
+        .disp_time = 350,
         .min_capacity = BATTERY_FULL_THRESH,
     },
 };
@@ -453,8 +452,7 @@ static void process_ps_uevent(struct charger *charger, struct uevent *uevent)
 
     if (!strcmp(uevent->action, "add")) {
         if (!supply) {
-            supply = add_supply(charger, uevent->ps_name, ps_type, uevent->path,
-                                online);
+            supply = add_supply(charger, uevent->ps_name, ps_type, uevent->path, online);
             if (!supply) {
                 LOGE("cannot add supply '%s' (%s %d)\n", uevent->ps_name,
                      uevent->ps_type, online);
@@ -970,7 +968,7 @@ int main(int argc, char **argv)
 
     ev_init(input_callback, charger);
 
-    fd = uevent_open_socket(64*1024, true);
+    fd = uevent_open_socket(65536, true); /* 64*1024 */
     if (fd >= 0) {
         fcntl(fd, F_SETFL, O_NONBLOCK);
         ev_add_fd(fd, uevent_callback, charger);
@@ -999,9 +997,7 @@ int main(int argc, char **argv)
 
     ev_sync_key_state(set_key_callback, charger);
 
-#ifndef CHARGER_DISABLE_INIT_BLANK
     gr_fb_blank(true);
-#endif
 
     charger->next_screen_transition = now - 1;
     charger->next_key_check = -1;

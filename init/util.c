@@ -392,8 +392,9 @@ void open_devnull_stdio(void)
 
 void get_hardware_name(char *hardware, unsigned int *revision)
 {
-    char data[1024];
-    int fd, n;
+    char *data = 0;
+    size_t len = 0, limit;
+    int fd = -1, n;
     char *x, *hw, *rev;
 
     /* Hardware string was provided on kernel command line */
@@ -403,11 +404,19 @@ void get_hardware_name(char *hardware, unsigned int *revision)
     fd = open("/proc/cpuinfo", O_RDONLY);
     if (fd < 0) return;
 
-    n = read(fd, data, 1023);
-    close(fd);
-    if (n < 0) return;
+    do {
+        limit = len ? len * 2 : 1024;
+        x = realloc(data, limit);
+        if (!x) goto done;
+        data = x;
 
-    data[n] = 0;
+        n = read(fd, data + len, limit - len);
+        if (n < 0) goto done;
+        len += n;
+    }
+    while (len == limit);
+
+    data[len] = 0;
     hw = strstr(data, "\nHardware");
     rev = strstr(data, "\nRevision");
 
@@ -432,6 +441,11 @@ void get_hardware_name(char *hardware, unsigned int *revision)
             *revision = strtoul(x + 2, 0, 16);
         }
     }
+
+done:
+    if (fd >= 0)
+        close(fd);
+    free(data);
 }
 
 void import_kernel_cmdline(int in_qemu,

@@ -70,6 +70,23 @@ int __android_log_dev_available(void)
     return (g_log_status == kLogAvailable);
 }
 
+#ifdef HTCLOG
+signed int __htclog_read_masks(char *buf, signed int len)
+{
+    return 0;
+}
+
+int __htclog_init_mask(const char *a1, unsigned int a2, int a3)
+{
+    return 0;
+}
+
+int __htclog_print_private(int a1, const char *a2, const char *fmt, ...)
+{
+    return 0;
+}
+#endif
+
 static int __write_to_log_null(log_id_t log_fd, struct iovec *vec, size_t nr)
 {
     return -1;
@@ -147,7 +164,18 @@ int __android_log_write(int prio, const char *tag, const char *msg)
         !strcmp(tag, "STK") ||
         !strcmp(tag, "CDMA") ||
         !strcmp(tag, "PHONE") ||
-        !strcmp(tag, "SMS"))
+        !strcmp(tag, "SMS") ||
+        !strcmp(tag, "KINETO") ||
+        !strncmp(tag, "KIPC", 4) ||
+        !strncmp(tag, "Kineto", 6) ||
+        !strncmp(tag, "QCRIL", 5) ||
+        !strncmp(tag, "QC-RIL", 6) ||
+        !strncmp(tag, "QC-QMI", 6) ||
+        !strncmp(tag, "QC-ONCRPC", 9) ||
+        !strncmp(tag, "QC-DSI", 6) ||
+        !strcmp(tag, "QC-NETMGR-LIB") ||
+        !strcmp(tag, "QC-QDP")
+        )
             log_id = LOG_ID_RADIO;
 
     vec[0].iov_base   = (unsigned char *) &prio;
@@ -176,7 +204,16 @@ int __android_log_buf_write(int bufID, int prio, const char *tag, const char *ms
         !strcmp(tag, "STK") ||
         !strcmp(tag, "CDMA") ||
         !strcmp(tag, "PHONE") ||
-        !strcmp(tag, "SMS"))
+        !strcmp(tag, "SMS") ||
+        !strcmp(tag, "KINETO") ||
+        !strncmp(tag, "KIPC", 4) ||
+        !strncmp(tag, "Kineto", 6) ||
+        !strncmp(tag, "QCRIL", 5) ||
+        !strncmp(tag, "QC-RIL", 6) ||
+        !strncmp(tag, "QC-QMI", 6) ||
+        !strncmp(tag, "QC-ONCRPC", 9) ||
+        !strncmp(tag, "QC-DSI", 6)
+        )
             bufID = LOG_ID_RADIO;
 
     vec[0].iov_base   = (unsigned char *) &prio;

@@ -15,6 +15,7 @@
  */
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -53,6 +54,7 @@
 void add_environment(const char *name, const char *value);
 
 extern int init_module(void *, unsigned long, const char *);
+extern int init_export_rc_file(const char *);
 
 static int write_file(const char *path, const char *value)
 {
@@ -234,6 +236,23 @@ int do_class_reset(int nargs, char **args)
     return 0;
 }
 
+int do_export_rc(int nargs, char **args)
+{
+        /* Import environments from a specified file.
+         * The file content is of the form:
+         *     export <env name> <value>
+         * e.g.
+         *     export LD_PRELOAD /system/lib/xyz.so
+         *     export PROMPT abcde
+         * Differences between "import" and "export_rc":
+         * 1) export_rc can only import environment vars
+         * 2) export_rc is performed when the command
+         *    is executed rather than at the time the
+         *    command is parsed (i.e. "import")
+         */
+    return init_export_rc_file(args[1]);
+}
+
 int do_domainname(int nargs, char **args)
 {
     return write_file("/proc/sys/kernel/domainname", args[1]);
@@ -334,6 +353,32 @@ int do_insmod(int nargs, char **args)
     }
 
     return do_insmod_inner(nargs, args, size);
+}
+
+int do_log(int nargs, char **args)
+{
+    char* par[nargs+3];
+    char* value;
+    int i;
+
+    par[0] = "exec";
+    par[1] = "/system/bin/log";
+    par[2] = "-tinit";
+    for (i = 1; i < nargs; ++i) {
+        value = args[i];
+        if (value[0] == '$') {
+            /* system property if value starts with '$' */
+            value++;
+            if (value[0] != '$') {
+                value = (char*) property_get(value);
+                if (!value) value = args[i];
+            }
+        }
+        par[i+2] = value;
+    }
+    par[nargs+2] = NULL;
+
+    return do_exec(nargs+2, par);
 }
 
 int do_mkdir(int nargs, char **args)
@@ -641,8 +686,7 @@ int do_restart(int nargs, char **args)
     struct service *svc;
     svc = service_find_by_name(args[1]);
     if (svc) {
-        service_stop(svc);
-        service_start(svc, NULL);
+        service_restart(svc);
     }
     return 0;
 }

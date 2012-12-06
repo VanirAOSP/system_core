@@ -33,6 +33,7 @@ loglevel 0
     export ANDROID_BOOTLOGO 1
     export ANDROID_ROOT /system
     export ANDROID_ASSETS /system/app
+    export ANDROID_CACHE /cache
     export ANDROID_DATA /data
     export ANDROID_STORAGE /storage
     export ASEC_MOUNTPOINT /mnt/asec
@@ -83,10 +84,6 @@ loglevel 0
     # Filesystem image public mount points.
     mkdir /mnt/obb 0700 root system
     mount tmpfs tmpfs /mnt/obb mode=0755,gid=1000
-
-    # Fuse public mount points.
-    mkdir /mnt/fuse 0775 system system
-    mount tmpfs tmpfs /mnt/fuse mode=0775,gid=1000
 
     write /proc/sys/kernel/panic_on_oops 1
     write /proc/sys/kernel/hung_task_timeout_secs 25 #0
@@ -415,18 +412,19 @@ on boot
 
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
-    setprop net.tcp.buffersize.default 4096,87380,110208,4096,16384,110208
+    setprop net.tcp.buffersize.default 4096,87380,704512,4096,16384,110208
     #VANIR HAD   4096,87380,256960,4096,16384,256960 for net.tcp.buffersize.default
     setprop net.tcp.buffersize.wifi    524288,1048576,2097152,262144,524288,1048576
-    setprop net.tcp.buffersize.lte     524288,1048576,2097152,262144,524288,1048576
-    setprop net.tcp.buffersize.umts    4094,87380,110208,4096,16384,110208
-    setprop net.tcp.buffersize.hspa    4094,87380,262144,4096,16384,262144
-    setprop net.tcp.buffersize.hsupa   4094,87380,262144,4096,16384,262144
-    setprop net.tcp.buffersize.hsdpa   4094,87380,262144,4096,16384,262144
-    setprop net.tcp.buffersize.hspap   4094,87380,1220608,4096,16384,1220608
-    setprop net.tcp.buffersize.edge    4093,26280,35040,4096,16384,35040
-    setprop net.tcp.buffersize.gprs    4092,8760,11680,4096,8760,11680
-    setprop net.tcp.buffersize.evdo    4094,87380,262144,4096,16384,262144
+    setprop net.tcp.buffersize.lte     4096,87380,1220608,4096,16384,563200
+    setprop net.tcp.buffersize.umts    4096,87380,563200,4096,16384,110208
+    setprop net.tcp.buffersize.hspa    4096,87380,704512,4096,16384,110208
+    setprop net.tcp.buffersize.hsupa   4096,87380,704512,4096,16384,262144
+    setprop net.tcp.buffersize.hsdpa   4096,87380,704512,4096,16384,262144
+    setprop net.tcp.buffersize.hspap   4096,87380,1220608,4096,16384,393216
+    setprop net.tcp.buffersize.edge    4096,26280,35040,4096,16384,35040
+    setprop net.tcp.buffersize.gprs    4096,8760,11680,4096,8760,11680
+    setprop net.tcp.buffersize.evdo    4096,87380,563200,4096,16384,262144
+    setprop net.tcp.buffersize.evdo_b  4096,87380,704512,4096,16384,262144
 
 # Add KSM Support
     chown root system /sys/kernel/mm/ksm/pages_to_scan
@@ -572,7 +570,7 @@ service drm /system/bin/drmserver
 service media /system/bin/mediaserver
     class main
     user media
-    group audio camera inet net_bt net_bt_admin net_bw_acct drmrpc
+    group audio camera inet net_bt net_bt_admin net_bw_acct drmrpc qcom_diag
     ioprio rt 4
 
 service bootanim /system/bin/bootanimation

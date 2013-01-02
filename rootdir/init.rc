@@ -53,9 +53,6 @@ loglevel 3
     mount cgroup none /acct cpuacct
     mkdir /acct/uid
 
-# Backwards compat (no longer there in stock ICS or JB)
-    symlink /mnt/sdcard /sdcard
-
     mkdir /system
     mkdir /data 0771 system system
     mkdir /cache 0771 system cache

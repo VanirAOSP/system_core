@@ -201,7 +201,6 @@ on post-fs-data
     mkdir /data/misc/adb 02750 system shell
     mkdir /data/misc/bluedroid 0770 bluetooth net_bt_stack
     mkdir /data/misc/bluetooth 0770 system system
-    mkdir /data/misc/gatord 0700 root root
     mkdir /data/misc/keystore 0700 keystore keystore
     mkdir /data/misc/keychain 0771 system system
     mkdir /data/misc/sms 0770 system radio
@@ -400,9 +399,6 @@ on boot
     chown system system /sys/kernel/ipv4/tcp_rmem_max
     chown root radio /proc/cmdline
 
-# Load gator module
-    insmod /system/modules/gator.ko
-
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
     setprop net.tcp.buffersize.default 4096,87380,704512,4096,16384,110208
@@ -464,15 +460,15 @@ on property:selinux.reload_policy=1
 service console /system/bin/sh
     class core
     console
-    #disabled
-    #user shell
+    disabled
+    user shell
     group log
 
 on property:ro.debuggable=1
     start console
 
-#on property:ro.secure=0
-#   start console
+on property:ro.secure=0
+   start console
 
 # adbd is controlled via property triggers in init.<platform>.usb.rc
 service adbd /sbin/adbd
@@ -487,13 +483,6 @@ on property:persist.service.adb.enable=1
 
 on property:persist.service.adb.enable=0
     stop adbd
-
-#we don't go no stinkin eth0
-#service dhcpcd_eth0 /system/bin/dhcpcd -dABKL
-#    class main
-#    group dhcp
-#    disabled
-#    oneshot
 
 # adbd on at boot in emulator
 on property:ro.kernel.qemu=1

@@ -16,7 +16,7 @@ EXTRA_SRCS :=
 ifeq ($(HOST_OS),linux)
   USB_SRCS := usb_linux.c
   EXTRA_SRCS := get_my_path_linux.c
-  LOCAL_LDLIBS += -lrt -lncurses -lpthread
+  LOCAL_LDLIBS += -lrt -ldl -lncurses -lpthread
 endif
 
 ifeq ($(HOST_OS),darwin)
@@ -88,6 +88,7 @@ LOCAL_CFLAGS += -D_XOPEN_SOURCE -D_GNU_SOURCE
 LOCAL_MODULE := adb
 
 LOCAL_STATIC_LIBRARIES := libzipfile libunz libcrypto_static $(EXTRA_STATIC_LIBS)
+LOCAL_LDLIBS += -ldl
 ifeq ($(USE_SYSDEPS_WIN32),)
 	LOCAL_STATIC_LIBRARIES += libcutils
 endif
@@ -163,7 +164,7 @@ include $(BUILD_EXECUTABLE)
 ifneq ($(SDK_ONLY),true)
 include $(CLEAR_VARS)
 
-LOCAL_LDLIBS := -lrt -lncurses -lpthread
+LOCAL_LDLIBS := -lrt -ldl -lncurses -lpthread
 
 LOCAL_SRC_FILES := \
 	adb.c \

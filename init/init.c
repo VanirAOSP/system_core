@@ -80,6 +80,8 @@ static int   bootchart_count;
 #define BOARD_CHARGING_CMDLINE_VALUE "true"
 #endif
 
+#define INIT_COMMAND_PRINT_BUF_LENGTH 64
+
 static char console[32];
 static char bootmode[32];
 static char hardware[32];
@@ -564,7 +566,20 @@ void execute_one_command(void)
         return;
 
     ret = cur_command->func(cur_command->nargs, cur_command->args);
-    INFO("command '%s' r=%d\n", cur_command->args[0], ret);
+    
+    char *buffer = (char*)malloc(INIT_COMMAND_PRINT_BUF_LENGTH);
+    memset(buffer, 0, INIT_COMMAND_PRINT_BUF_LENGTH);
+    int i,written;
+    for(i=0, written=0; i<cur_command->nargs; i++) {
+        written += strlen(cur_command->args[i]);;
+        if (written > INIT_COMMAND_PRINT_BUF_LENGTH)
+            break;
+        strcat(buffer, cur_command->args[i]);
+        if (i < cur_command->nargs - 1 && written+1 < INIT_COMMAND_PRINT_BUF_LENGTH)
+            strcat(buffer, " ");
+    }
+    free(buffer);
+    INFO("command '%s' r=%d\n", buffer, ret);
 }
 
 #ifdef BOARD_USE_MOTOROLA_DEV_ALIAS

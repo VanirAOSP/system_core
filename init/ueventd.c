@@ -51,7 +51,7 @@ int ueventd_main(int argc, char **argv)
 {
     struct pollfd ufd;
     int nr;
-    char tmp[45];
+    char tmp[32];
 
     /*
      * init sets the umask to 077 for forked processes. We need to

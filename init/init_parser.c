@@ -570,48 +570,6 @@ void action_for_each_trigger(const char *trigger,
         }
     }
 }
-#ifdef BOARD_USE_MOTOROLA_DEV_ALIAS
-void queue_device_triggers(const char *name, int is_add)
-{
-    struct listnode *node;
-    struct action *act;
-    const char *trigger_names[] = { "device-removed-", "device-added-" };
-
-    list_for_each(node, &action_list) {
-        act = node_to_item(node, struct action, alist);
-        if (!strncmp(act->name, trigger_names[is_add],
-                     strlen(trigger_names[is_add]))) {
-            const char *devname = act->name + strlen(trigger_names[is_add]);
-
-            if (!strcmp(devname, name)) {
-                action_add_queue_tail(act);
-            }
-        }
-    }
-}
-
-void queue_all_device_triggers(void)
-{
-    struct listnode *node;
-    struct action *act;
-    const char *added = "device-added-";
-    struct stat devstat;
-
-    list_for_each(node, &action_list) {
-        act = node_to_item(node, struct action, alist);
-        if (!strncmp(act->name, added, strlen(added))) {
-            const char *devpath = act->name + strlen(added);
-            if (!stat(devpath, &devstat)) {
-                if (!((devstat.st_mode & S_IFMT) == S_IFREG ||
-                      (devstat.st_mode & S_IFMT) == S_IFDIR)) {
-                    ERROR("queuing %s\n", act->name);
-                    action_add_queue_tail(act);
-                }
-            }
-        }
-    }
-}
-#endif
 
 void queue_property_triggers(const char *name, const char *value)
 {
@@ -674,6 +632,7 @@ void queue_builtin_action(int (*func)(int nargs, char **args), char *name)
     act = calloc(1, sizeof(*act));
     act->name = name;
     list_init(&act->commands);
+    list_init(&act->qlist);
 
     cmd = calloc(1, sizeof(*cmd));
     cmd->func = func;
@@ -686,7 +645,9 @@ void queue_builtin_action(int (*func)(int nargs, char **args), char *name)
 
 void action_add_queue_tail(struct action *act)
 {
-    list_add_tail(&action_queue, &act->qlist);
+    if (list_empty(&act->qlist)) {
+        list_add_tail(&action_queue, &act->qlist);
+    }
 }
 
 struct action *action_remove_queue_head(void)
@@ -697,6 +658,7 @@ struct action *action_remove_queue_head(void)
         struct listnode *node = list_head(&action_queue);
         struct action *act = node_to_item(node, struct action, qlist);
         list_remove(node);
+        list_init(node);
         return act;
     }
 }
@@ -867,7 +829,7 @@ static void parse_line_service(struct parse_state *state, int nargs, char **args
         svc->envvars = ei;
         break;
     }
-    case K_socket: {/* name type perm [ uid gid ] */
+    case K_socket: {/* name type perm [ uid gid context ] */
         struct socketinfo *si;
         if (nargs < 4) {
             parse_error(state, "socket option requires name, type, perm arguments\n");
@@ -890,6 +852,8 @@ static void parse_line_service(struct parse_state *state, int nargs, char **args
             si->uid = decode_uid(args[4]);
         if (nargs > 5)
             si->gid = decode_uid(args[5]);
+        if (nargs > 6)
+            si->socketcon = args[6];
         si->next = svc->sockets;
         svc->sockets = si;
         break;
@@ -902,13 +866,11 @@ static void parse_line_service(struct parse_state *state, int nargs, char **args
         }
         break;
     case K_seclabel:
-#ifdef HAVE_SELINUX
         if (nargs != 2) {
             parse_error(state, "seclabel option requires a label string\n");
         } else {
             svc->seclabel = args[1];
         }
-#endif
         break;
 
     default:
@@ -930,6 +892,7 @@ static void *parse_action(struct parse_state *state, int nargs, char **args)
     act = calloc(1, sizeof(*act));
     act->name = args[1];
     list_init(&act->commands);
+    list_init(&act->qlist);
     list_add_tail(&action_list, &act->alist);
         /* XXX add to hash */
     return act;

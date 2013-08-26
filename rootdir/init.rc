@@ -440,7 +440,6 @@ on boot
     chown root radio /proc/cmdline
 
 # Set these so we can remotely update SELinux policy
-    chown system system /sys/fs/selinux/load
     chown system system /sys/fs/selinux/enforce
 
     # allow system to modify cpufreq control files

@@ -22,9 +22,21 @@ ALL_PREBUILT += $(copy_to)
 # Only copy init.rc if the target doesn't have its own.
 ifneq ($(TARGET_PROVIDES_INIT_RC),true)
 file := $(TARGET_ROOT_OUT)/init.rc
-$(file) : $(LOCAL_PATH)/init.rc | $(ACP)
+file_tmp := $(TARGET_OUT)/init.rc
+
+ifneq ($(TARGET_INIT_RC_LOGLEVEL),)
+$(file_tmp) : $(LOCAL_PATH)/init.rc | $(ACP)
+	$(transform-prebuilt-to-target)
+	sed -i "s/loglevel.*/loglevel ${TARGET_INIT_RC_LOGLEVEL}/g" $(file_tmp)
+else
+$(file_tmp) : $(LOCAL_PATH)/init.rc | $(ACP)
+	$(transform-prebuilt-to-target)
+endif
+
+$(file) : $(file_tmp) | $(ACP)
 	$(transform-prebuilt-to-target)
 ALL_PREBUILT += $(file)
+
 $(INSTALLED_RAMDISK_TARGET): $(file)
 endif
 

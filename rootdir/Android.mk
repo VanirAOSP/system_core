@@ -21,8 +21,9 @@ ALL_PREBUILT += $(copy_to)
 
 # Only copy init.rc if the target doesn't have its own.
 ifneq ($(TARGET_PROVIDES_INIT_RC),true)
+INIT_RC_TMP_DIR := $(OUT_DIR)/tmp
 file := $(TARGET_ROOT_OUT)/init.rc
-file_tmp := $(TARGET_OUT)/init.rc
+file_tmp := $(INIT_RC_TMP_DIR)/init.rc
 
 ifneq ($(TARGET_INIT_RC_LOGLEVEL),)
 $(file_tmp) : $(LOCAL_PATH)/init.rc | $(ACP)
@@ -38,6 +39,7 @@ $(file) : $(file_tmp) | $(ACP)
 ALL_PREBUILT += $(file)
 
 $(INSTALLED_RAMDISK_TARGET): $(file)
+	@hide rm -Rf $(INIT_RC_TMP_DIR)
 endif
 
 file := $(TARGET_ROOT_OUT)/ueventd.rc

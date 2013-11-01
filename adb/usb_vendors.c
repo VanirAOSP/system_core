@@ -147,6 +147,18 @@
 #define VENDOR_ID_OUYA          0x2836
 // Metrologic's Vendor ID
 #define VENDOR_ID_METROLOGIC    0x0c2e
+// Haier's USB Vendor ID
+#define VENDOR_ID_HAIER         0x201E
+// Hisense's USB Vendor ID
+#define VENDOR_ID_HISENSE       0x109b
+// MTK's USB Vendor ID
+#define VENDOR_ID_MTK           0x0e8d
+// B&N Nook's USB Vendor ID
+#define VENDOR_ID_NOOK          0x2080
+// Qisda's USB Vendor ID
+#define VENDOR_ID_QISDA         0x1D45
+// ECS's USB Vendor ID
+#define VENDOR_ID_ECS           0x03fc
 
 /** built-in vendor list */
 int builtInVendorIds[] = {
@@ -206,6 +218,12 @@ int builtInVendorIds[] = {
     VENDOR_ID_BYD,
     VENDOR_ID_OUYA,
     VENDOR_ID_METROLOGIC,
+    VENDOR_ID_HAIER,
+    VENDOR_ID_HISENSE,
+    VENDOR_ID_MTK,
+    VENDOR_ID_NOOK,
+    VENDOR_ID_QISDA,
+    VENDOR_ID_ECS,
 };
 
 #define BUILT_IN_VENDOR_COUNT    (sizeof(builtInVendorIds)/sizeof(builtInVendorIds[0]))

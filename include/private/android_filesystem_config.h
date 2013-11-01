@@ -34,8 +34,8 @@
 #endif
 
 /* This is the master Users and Groups config for the platform.
-** DO NOT EVER RENUMBER.
-*/
+ * DO NOT EVER RENUMBER
+ */
 
 #define AID_ROOT             0  /* traditional unix root user */
 
@@ -72,7 +72,12 @@
 #define AID_CLAT          1029  /* clat part of nat464 */
 #define AID_LOOP_RADIO    1030  /* loop radio devices */
 #define AID_MEDIA_DRM     1031  /* MediaDrm plugins */
-#define AID_AUDIT         1032  /* audit daemon */
+#define AID_PACKAGE_INFO  1032  /* access to installed package details */
+#define AID_SDCARD_PICS   1033  /* external storage photos access */
+#define AID_SDCARD_AV     1034  /* external storage audio/video access */
+#define AID_SDCARD_ALL    1035  /* access all users external storage */
+
+#define AID_AUDIT         1200  /* audit daemon -- WAS 1032... OH NOEZ I'M RENUMBERING ALL YOUR THINGSES */
 
 #define AID_THEMEMAN      1300  /* theme manager */
 
@@ -190,6 +195,10 @@ static const struct android_id_info android_ids[] = {
     { "nobody",    AID_NOBODY, },
     { "clat",      AID_CLAT, },
     { "mediadrm",  AID_MEDIA_DRM, },
+    { "package_info",  AID_PACKAGE_INFO, },
+    { "sdcard_pics",   AID_SDCARD_PICS, },
+    { "sdcard_av",     AID_SDCARD_AV, },
+    { "sdcard_all",    AID_SDCARD_ALL, },
     { "theme_man", AID_THEMEMAN },
     { "audit",      AID_AUDIT, },
 };
@@ -271,7 +280,7 @@ static const struct fs_path_config android_files[] = {
     { 06755, AID_ROOT,      AID_ROOT,      0, "system/xbin/tcpdump" },
     { 04770, AID_ROOT,      AID_RADIO,     0, "system/bin/pppd-ril" },
 
-    /* the following file has enhanced capabilities and IS included in user builds. */
+    /* the following files have enhanced capabilities and ARE included in user builds. */
     { 00750, AID_ROOT,      AID_SHELL,     (1 << CAP_SETUID) | (1 << CAP_SETGID), "system/bin/run-as" },
 
     { 00755, AID_ROOT,      AID_SHELL,     0, "system/bin/*" },

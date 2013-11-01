@@ -1,69 +1,37 @@
 LOCAL_PATH:= $(call my-dir)
-include $(CLEAR_VARS)
 
-# files that live under /system/etc/...
-
-copy_from := \
-	etc/hosts
-
-
-copy_to := $(addprefix $(TARGET_OUT)/,$(copy_from))
-copy_from := $(addprefix $(LOCAL_PATH)/,$(copy_from))
-
-$(copy_to) : PRIVATE_MODULE := system_etcdir
-$(copy_to) : $(TARGET_OUT)/% : $(LOCAL_PATH)/% | $(ACP)
-	$(transform-prebuilt-to-target)
-
-ALL_PREBUILT += $(copy_to)
-
-
-# files that live under /...
-
+#######################################
+# init.rc
 # Only copy init.rc if the target doesn't have its own.
 ifneq ($(TARGET_PROVIDES_INIT_RC),true)
-INIT_RC_TMP_DIR := $(OUT_DIR)/tmp
-file := $(TARGET_ROOT_OUT)/init.rc
-file_tmp := $(INIT_RC_TMP_DIR)/init.rc
+include $(CLEAR_VARS)
 
-ifneq ($(TARGET_INIT_RC_LOGLEVEL),)
-$(file_tmp) : $(LOCAL_PATH)/init.rc | $(ACP)
-	$(transform-prebuilt-to-target)
-	sed -i "s/loglevel.*/loglevel ${TARGET_INIT_RC_LOGLEVEL}/g" $(file_tmp)
-else
-$(file_tmp) : $(LOCAL_PATH)/init.rc | $(ACP)
-	$(transform-prebuilt-to-target)
+LOCAL_MODULE := init.rc
+LOCAL_SRC_FILES := $(LOCAL_MODULE)
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)
+include $(BUILD_PREBUILT)
 endif
+#######################################
+# init.environ.rc
 
-$(file) : $(file_tmp) | $(ACP)
-	$(transform-prebuilt-to-target)
-ALL_PREBUILT += $(file)
+include $(CLEAR_VARS)
+LOCAL_MODULE_CLASS := ETC
+LOCAL_MODULE := init.environ.rc
+LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)
 
-$(INSTALLED_RAMDISK_TARGET): $(file)
-	@hide rm -Rf $(INIT_RC_TMP_DIR)
-endif
-
-file := $(TARGET_ROOT_OUT)/ueventd.rc
-$(file) : $(LOCAL_PATH)/ueventd.rc | $(ACP)
-	$(transform-prebuilt-to-target)
-ALL_PREBUILT += $(file)
-$(INSTALLED_RAMDISK_TARGET): $(file)
-
-# init.usb.rc is handled by build/target/product/core.rc
-
-
+# Put it here instead of in init.rc module definition,
+# because init.rc is conditionally included.
+#
 # create some directories (some are mount points)
-DIRS := $(addprefix $(TARGET_ROOT_OUT)/, \
-		sbin \
-		dev \
-		proc \
-		sys \
-		system \
-		data \
-	) \
-	$(TARGET_OUT_DATA)
+LOCAL_POST_INSTALL_CMD := mkdir -p $(addprefix $(TARGET_ROOT_OUT)/, \
+    sbin dev proc sys system data)
 
-$(DIRS):
-	@echo Directory: $@
-	@mkdir -p $@
+include $(BUILD_SYSTEM)/base_rules.mk
 
-ALL_PREBUILT += $(DIRS)
+$(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/init.environ.rc.in
+	@echo "Generate: $< -> $@"
+	@mkdir -p $(dir $@)
+	$(hide) sed -e 's?%BOOTCLASSPATH%?$(PRODUCT_BOOTCLASSPATH)?g' $< >$@
+
+#######################################

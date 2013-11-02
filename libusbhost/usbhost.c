@@ -234,7 +234,9 @@ int usb_host_read_event(struct usb_host_context *context)
         while (offset < ret && !done) {
             event = (struct inotify_event*)&event_buf[offset];
             done = 0;
+            wd = event->wd;
             if (wd == context->wdd) {
+                if ((event->mask & IN_CREATE) && !strcmp(event->name, "bus")) {
                     context->wddbus = inotify_add_watch(context->fd, DEV_BUS_DIR, IN_CREATE | IN_DELETE);
                     if (context->wddbus < 0) {
                         done = 1;

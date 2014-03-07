@@ -21,4 +21,8 @@ LOCAL_CFLAGS += -DRESOURCE_MANAGER
 endif
 # RESOURCE MANAGER
 
+ifeq ($(strip $(BOARD_USES_DOLBY_SUBFORMAT)),true)
+LOCAL_CFLAGS += -DDOLBY_SUBFORMAT
+endif
+
 include $(call first-makefiles-under,$(LOCAL_PATH))

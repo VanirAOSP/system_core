@@ -125,7 +125,7 @@ typedef enum {
     AUDIO_FORMAT_PCM_SUB_8_BIT           = 0x2, /* DO NOT CHANGE - PCM unsigned 8 bits */
     AUDIO_FORMAT_PCM_SUB_32_BIT          = 0x3, /* PCM signed .31 fixed point */
     AUDIO_FORMAT_PCM_SUB_8_24_BIT        = 0x4, /* PCM signed 7.24 fixed point */
-#ifdef QCOM_HARDWARE
+#if defined(QCOM_HARDWARE) || defined(DOLBY_SUBFORMAT)
     AUDIO_FORMAT_PCM_SUB_24_BIT          = 0x5, /* PCM signed 24 fixed point */
 #endif
 } audio_format_pcm_sub_fmt_t;
@@ -154,7 +154,7 @@ typedef enum {
     AUDIO_FORMAT_VORBIS_SUB_NONE         = 0x0,
 } audio_format_vorbis_sub_fmt_t;
 
-#ifdef QCOM_HARDWARE
+#if defined(QCOM_HARDWARE) || defined(DOLBY_SUBFORMAT)
 /* DOLBY (AC3/EAC3) sub format field definition: specify dual-mono acmod... */
 
 typedef enum {
@@ -213,7 +213,7 @@ typedef enum {
                                         AUDIO_FORMAT_PCM_SUB_32_BIT),
     AUDIO_FORMAT_PCM_8_24_BIT        = (AUDIO_FORMAT_PCM |
                                         AUDIO_FORMAT_PCM_SUB_8_24_BIT),
-#ifdef QCOM_HARDWARE
+#if defined(QCOM_HARDWARE) || defined(DOLBY_SUBFORMAT)
     AUDIO_FORMAT_PCM_24_BIT          = (AUDIO_FORMAT_PCM |
                                           AUDIO_FORMAT_PCM_SUB_24_BIT),
     AUDIO_FORMAT_AC3_DM              =  (AUDIO_FORMAT_AC3 |

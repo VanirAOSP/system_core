@@ -156,6 +156,8 @@ loglevel 3
 # checker programs.
     mkdir /dev/fscklogs 0770 root system
 
+    trigger late-init
+
 on post-fs
     # once everything is setup, no need to modify /
     mount rootfs rootfs / ro remount

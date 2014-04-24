@@ -101,10 +101,10 @@ loglevel 3
     write /proc/sys/kernel/sched_wakeup_granularity_ns 1600000
     write /proc/sys/kernel/sched_compat_yield 1
     write /proc/sys/kernel/sched_child_runs_first 0
-# write /proc/sys/kernel/randomize_va_space 2
-# Disabled virtual memory randomization
-# (if randomization is enabled the AEM-JIT will have a lower cache hit rate)
-    write /proc/sys/kernel/randomize_va_space 0
+#    Disabled virtual memory randomization
+##    (this was causing a CTS failure)
+#    write /proc/sys/kernel/randomize_va_space 0
+    write /proc/sys/kernel/randomize_va_space 2
     write /proc/sys/kernel/kptr_restrict 2
     write /proc/sys/kernel/dmesg_restrict 1
     write /proc/sys/vm/mmap_min_addr 32768
@@ -138,8 +138,8 @@ loglevel 3
     chown system system /dev/cpuctl/apps/bg_non_interactive/tasks
     chmod 0666 /dev/cpuctl/apps/bg_non_interactive/tasks
     # 5.0 %
-    write /dev/cpuctl/apps/bg_non_interactive/cpu.shares 91
-    write /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us 400000
+    write /dev/cpuctl/apps/bg_non_interactive/cpu.shares 52
+    write /dev/cpuctl/apps/bg_non_interactive/cpu.rt_runtime_us 700000
     write /dev/cpuctl/apps/bg_non_interactive/cpu.rt_period_us 1000000
 
 # qtaguid will limit access to specific data based on group memberships.

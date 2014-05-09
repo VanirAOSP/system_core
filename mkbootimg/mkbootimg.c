@@ -87,7 +87,7 @@ int write_padding(int fd, unsigned pagesize, unsigned itemsize)
 
     count = pagesize - (itemsize & pagemask);
 
-    if(write(fd, padding, count) != count) {
+    if(write(fd, padding, count) != (signed)count) {
         return -1;
     } else {
         return 0;
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
         return usage();
     }
 
-    strcpy(hdr.name, board);
+    strcpy((char *)hdr.name, board);
 
     memcpy(hdr.magic, BOOT_MAGIC, BOOT_MAGIC_SIZE);
 
@@ -240,15 +240,15 @@ int main(int argc, char **argv)
      * differentiated based on their first 2k.
      */
     SHA_init(&ctx);
-    SHA_update(&ctx, kernel_data, hdr.kernel_size);
-    SHA_update(&ctx, &hdr.kernel_size, sizeof(hdr.kernel_size));
-    SHA_update(&ctx, ramdisk_data, hdr.ramdisk_size);
-    SHA_update(&ctx, &hdr.ramdisk_size, sizeof(hdr.ramdisk_size));
-    SHA_update(&ctx, second_data, hdr.second_size);
-    SHA_update(&ctx, &hdr.second_size, sizeof(hdr.second_size));
+    SHA_update(&ctx, kernel_data, (int)hdr.kernel_size);
+    SHA_update(&ctx, &hdr.kernel_size, (int)sizeof(hdr.kernel_size));
+    SHA_update(&ctx, ramdisk_data, (int)hdr.ramdisk_size);
+    SHA_update(&ctx, &hdr.ramdisk_size, (int)sizeof(hdr.ramdisk_size));
+    SHA_update(&ctx, second_data, (int)hdr.second_size);
+    SHA_update(&ctx, &hdr.second_size, (int)sizeof(hdr.second_size));
     if(dt_data) {
-        SHA_update(&ctx, dt_data, hdr.dt_size);
-        SHA_update(&ctx, &hdr.dt_size, sizeof(hdr.dt_size));
+        SHA_update(&ctx, dt_data, (int)hdr.dt_size);
+        SHA_update(&ctx, &hdr.dt_size, (int)sizeof(hdr.dt_size));
     }
     sha = SHA_final(&ctx);
     memcpy(hdr.id, sha,
@@ -263,19 +263,19 @@ int main(int argc, char **argv)
     if(write(fd, &hdr, sizeof(hdr)) != sizeof(hdr)) goto fail;
     if(write_padding(fd, pagesize, sizeof(hdr))) goto fail;
 
-    if(write(fd, kernel_data, hdr.kernel_size) != hdr.kernel_size) goto fail;
+    if(write(fd, kernel_data, hdr.kernel_size) != (signed)hdr.kernel_size) goto fail;
     if(write_padding(fd, pagesize, hdr.kernel_size)) goto fail;
 
-    if(write(fd, ramdisk_data, hdr.ramdisk_size) != hdr.ramdisk_size) goto fail;
+    if(write(fd, ramdisk_data, hdr.ramdisk_size) != (signed)hdr.ramdisk_size) goto fail;
     if(write_padding(fd, pagesize, hdr.ramdisk_size)) goto fail;
 
     if(second_data) {
-        if(write(fd, second_data, hdr.second_size) != hdr.second_size) goto fail;
+        if(write(fd, second_data, hdr.second_size) != (signed)hdr.second_size) goto fail;
         if(write_padding(fd, pagesize, hdr.ramdisk_size)) goto fail;
     }
 
     if(dt_data) {
-        if(write(fd, dt_data, hdr.dt_size) != hdr.dt_size) goto fail;
+        if(write(fd, dt_data, hdr.dt_size) != (signed)hdr.dt_size) goto fail;
         if(write_padding(fd, pagesize, hdr.dt_size)) goto fail;
     }
     return 0;

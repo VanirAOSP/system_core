@@ -630,13 +630,3 @@ on property:ro.build.type=userdebug
 on property:ro.build.type=user
     chmod 0771 /data/anr
     chmod 01771 /data/misc
-
-service quickbootcharger /charger -m 1
-    disabled
-    oneshot
-
-on property:sys.qbcharger.enable=true
-    start quickbootcharger
-
-on property:sys.qbcharger.enable=false
-    stop quickbootcharger

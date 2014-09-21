@@ -53,6 +53,7 @@
 #define FIRMWARE_DIR3   "/firmware/image"
 
 extern struct selabel_handle *sehandle;
+extern char bootdevice[32];
 
 static int device_fd = -1;
 
@@ -239,17 +240,25 @@ static void add_platform_device(const char *path)
     struct platform_node *bus;
     const char *name = path;
 
+#ifdef _PLATFORM_BASE
+    if (!strncmp(path, _PLATFORM_BASE, strlen(_PLATFORM_BASE)))
+        name += strlen(_PLATFORM_BASE);
+    else
+        return;
+#else
     if (!strncmp(path, "/devices/", 9)) {
         name += 9;
         if (!strncmp(name, "platform/", 9))
             name += 9;
     }
+#endif
 
     list_for_each_reverse(node, &platform_names) {
         bus = node_to_item(node, struct platform_node, list);
         if ((bus->path_len < path_len) &&
                 (path[bus->path_len] == '/') &&
-                !strncmp(path, bus->path, bus->path_len))
+                !strncmp(path, bus->path, bus->path_len) &&
+                (strcmp(bus->path, "/devices/soc.0") != 0))
             /* subdevice of an existing platform, ignore it */
             return;
     }
@@ -520,6 +529,10 @@ static char **parse_platform_block_device(struct uevent *uevent)
         link_num++;
     else
         links[link_num] = NULL;
+
+    if (!strncmp(device, bootdevice, sizeof(bootdevice))) {
+        make_link(link_path, "/dev/block/bootdevice");
+    }
 
     return links;
 }

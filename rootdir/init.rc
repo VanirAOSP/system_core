@@ -279,15 +279,10 @@ on post-fs-data
     # create directory for DRM plug-ins - give drm the read/write access to
     # the following directory.
     mkdir /data/drm 0770 drm drm
-    chmod 0770 /data/drm
-    chown drm drm /data/drm
 
     # create directory for MediaDrm plug-ins - give drm the read/write access to
     # the following directory.
     mkdir /data/mediadrm 0770 mediadrm mediadrm
-    # make sure that shit has the right fucking perms
-    chmod 0770 /data/mediadrm
-    chown mediadrm mediadrm /data/mediadrm
 
     # symlink to bugreport storage location
     symlink /data/data/com.android.shell/files/bugreports /data/bugreports

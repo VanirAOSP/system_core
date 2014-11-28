@@ -26,7 +26,7 @@ on early-init
 
     # Set the security context of /adb_keys if present.
     restorecon /adb_keys
-    setenforce 0
+
     start ueventd
 
     # create mountpoints
@@ -605,7 +605,7 @@ service installd /system/bin/installd
 
 service flash_recovery /system/etc/install-recovery.sh
     class main
-    # seclabel u:r:install_recovery:s0
+    seclabel u:r:install_recovery:s0
     oneshot
     disabled
 

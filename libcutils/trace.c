@@ -34,6 +34,7 @@ volatile int32_t        atrace_is_ready      = 0;
 int                     atrace_marker_fd     = -1;
 uint64_t                atrace_enabled_tags  = ATRACE_TAG_NOT_READY;
 static bool             atrace_is_debuggable = false;
+static bool             atrace_cried_once = false;
 static volatile int32_t atrace_is_enabled    = 1;
 static pthread_once_t   atrace_once_control  = PTHREAD_ONCE_INIT;
 static pthread_mutex_t  atrace_tags_mutex    = PTHREAD_MUTEX_INITIALIZER;
@@ -168,7 +169,10 @@ static void atrace_init_once()
 {
     atrace_marker_fd = open("/sys/kernel/debug/tracing/trace_marker", O_WRONLY);
     if (atrace_marker_fd == -1) {
-        ALOGE("Error opening trace file: %s (%d)", strerror(errno), errno);
+        if (!atrace_cried_once) {
+            atrace_cried_once = true;
+            ALOGE("Error opening trace file: %s (%d)", strerror(errno), errno);
+        }
         atrace_enabled_tags = 0;
         goto done;
     }

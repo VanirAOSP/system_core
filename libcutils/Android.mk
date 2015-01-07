@@ -150,6 +150,11 @@ ifeq ($(TARGET_RECOVERY_PRE_COMMAND_CLEAR_REASON),true)
 endif
 
 LOCAL_C_INCLUDES := $(libcutils_c_includes)
+
+ifneq ($(TARGET_PREBUILT_KERNEL),)
+     LOCAL_C_INCLUDES += $(KERNEL_HEADERS)
+endif
+
 LOCAL_STATIC_LIBRARIES := liblog
 LOCAL_CFLAGS += $(targetSmpFlag) -Werror
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk

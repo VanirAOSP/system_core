@@ -90,7 +90,6 @@ char *locale;
 
 #define LOGE(x...) do { KLOG_ERROR("charger", x); } while (0)
 #define LOGW(x...) do { KLOG_WARNING("charger", x); } while (0)
-#define LOGI(x...) do { KLOG_INFO("charger", x); } while (0)
 #define LOGV(x...) do { KLOG_DEBUG("charger", x); } while (0)
 
 extern int mode;
@@ -762,17 +761,18 @@ static void handle_input_state(struct charger *charger, int64_t now)
 static void handle_power_supply_state(struct charger *charger, int64_t now)
 {
     static int old_soc = 0;
-    int soc;
+    int soc = 0;
 
     if (!charger->have_battery_state)
         return;
 
-    if (batt_prop) {
+    if (batt_prop && batt_prop->batteryLevel >= 0) {
         soc = batt_prop->batteryLevel;
-        if (old_soc != soc) {
-            old_soc = soc;
-            set_battery_soc_leds(soc);
-        }
+    }
+
+    if (old_soc != soc) {
+        old_soc = soc;
+        set_battery_soc_leds(soc);
     }
 
     if (!charger->charger_connected) {

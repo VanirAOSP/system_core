@@ -61,9 +61,9 @@ endif
 
 LOCAL_HAL_STATIC_LIBRARIES := libhealthd
 
-# Symlink /charger to /sbin/healthd
+# Symlink /charger to /sbin/charger
 LOCAL_POST_INSTALL_CMD := $(hide) mkdir -p $(TARGET_ROOT_OUT) \
-    && rm -f $(TARGET_ROOT_OUT)/charger && ln -sf /sbin/healthd $(TARGET_ROOT_OUT)/charger
+    && ln -sf /sbin/charger $(TARGET_ROOT_OUT)/charger
 
 include $(BUILD_EXECUTABLE)
 

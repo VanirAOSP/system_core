@@ -56,6 +56,7 @@ OUR_TOOLS := \
     stop \
     top \
     uptime \
+    watchprops \
 
 ALL_TOOLS = $(BSD_TOOLS) $(OUR_TOOLS)
 

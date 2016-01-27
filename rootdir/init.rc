@@ -33,9 +33,6 @@ on init
     # Link /vendor to /system/vendor for devices without a vendor partition.
     symlink /system/vendor /vendor
 
-    # Link /bin to /system/bin for crond
-    symlink /system/bin /bin
-
     # Create cgroup mount point for cpu accounting
     mkdir /acct
     mount cgroup none /acct cpuacct

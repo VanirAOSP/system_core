@@ -30,7 +30,6 @@
 #include <unistd.h>
 
 #include <android-base/file.h>
-#include <crypto_utils/android_pubkey.h>
 #include <android-base/strings.h>
 #include <crypto_utils/android_pubkey.h>
 #include <cutils/properties.h>
